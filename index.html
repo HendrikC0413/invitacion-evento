@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invitación Especial</title>
+  <style>
+    /* Estilos simples y elegantes (fáciles de personalizar) */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 { color: #2c3e50; font-size: 24px; margin-bottom: 10px; }
+    p { font-size: 16px; color: #555; line-height: 1.5; }
+    .options { margin: 20px 0; text-align: left; }
+    .options label { display: block; margin: 10px 0; font-size: 15px; cursor: pointer; }
+    button {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.3s;
+    }
+    button:hover { background-color: #219150; }
+    #mensaje-respuesta { margin-top: 15px; font-weight: bold; color: #27ae60; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1 id="saludo">¡Estás Invitado/a!</h1>
+    <p>Nos encantaría contar con tu presencia en nuestro evento especial.</p>
+    
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+    <form id="rsvp-form">
+      <p>¿Nos acompañan, <strong id="nombre-pantalla">Querido/a Invitado/a</strong>?</p>
+      
+      <div class="options">
+        <label>
+          <input type="radio" name="asistencia" value="Confirmado" required> ¡Sí, ahí estaremos! 🎉
+        </label>
+        <label>
+          <input type="radio" name="asistencia" value="No Asiste"> Lamentablemente no podremos ir 😢
+        </label>
+      </div>
+
+      <button type="submit" id="btn-submit">Enviar Confirmación</button>
+    </form>
+
+    <div id="mensaje-respuesta"></div>
+  </div>
+
+  <script>
+    // 1. REEMPLAZA ESTA URL CON TU URL DE GOOGLE APPS SCRIPT DEL PASO 1
+    const URL_DE_TU_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbzYIzoTr_qark-S_CegwiroLlKqZWRAEhtAVtU4IDnE3rrqdkRoHGQIaNtC9qiFYVWi/exec";
+
+    // 2. Leer la URL para obtener el parámetro "invitado"
+    const urlParams = new URLSearchParams(window.location.search);
+    const invitado = urlParams.get('invitado') || "Invitado/a Especial";
+
+    // Mostrar el nombre capturado en la pantalla
+    document.getElementById('nombre-pantalla').textContent = invitado;
+    document.getElementById('saludo').textContent = `¡Hola, ${invitado}!`;
+
+    // 3. Manejar el envío del formulario
+    const form = document.getElementById('rsvp-form');
+    const mensajeRespuesta = document.getElementById('mensaje-respuesta');
+    const btnSubmit = document.getElementById('btn-submit');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = "Guardando...";
+
+      const respuestaAsistencia = document.querySelector('input[name="asistencia"]:checked').value;
+
+      const datos = {
+        nombre: invitado,
+        asistencia: respuestaAsistencia
+      };
+
+      // Enviar datos a Google Sheets
+      fetch(URL_DE_TU_APPS_SCRIPT, {
+        method: 'POST',
+        mode: 'no-cors', // Evita bloqueos de CORS
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+      })
+      .then(() => {
+        form.style.display = 'none';
+        mensajeRespuesta.textContent = "¡Muchas gracias! Tu respuesta ha sido registrada.";
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = "Enviar Confirmación";
+        alert("Hubo un error al enviar tu respuesta. Por favor intenta de nuevo.");
+      });
+    });
+  </script>
+</body>
+</html>
