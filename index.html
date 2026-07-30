@@ -5,10 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Invitación Especial</title>
   <style>
-    /* Estilos simples y elegantes (fáciles de personalizar) */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4f4f9;
+      /* 
+       * ESPACIO PARA BACKGROUND: Reemplaza la URL de abajo con la de tu imagen.
+       * 'cover' y 'fixed' aseguran que se amolde y se vea perfecto tanto en web como en móvil. 
+       */
+      background: url('https://via.placeholder.com/1920x1080?text=Fondo+de+Ejemplo') no-repeat center center fixed;
+      background-size: cover; 
+      background-color: #f4f4f9; /* Color de respaldo si la imagen falla */
       color: #333;
       display: flex;
       justify-content: center;
@@ -18,106 +23,119 @@
       padding: 20px;
     }
     .card {
-      background: white;
-      padding: 30px;
+      /* Fondo blanco semitransparente para que el texto sea legible sobre cualquier imagen */
+      background: rgba(255, 255, 255, 0.95); 
+      padding: 35px;
       border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
       max-width: 400px;
       width: 100%;
       text-align: center;
     }
-    h1 { color: #2c3e50; font-size: 24px; margin-bottom: 10px; }
-    p { font-size: 16px; color: #555; line-height: 1.5; }
-    .options { margin: 20px 0; text-align: left; }
-    .options label { display: block; margin: 10px 0; font-size: 15px; cursor: pointer; }
+    /* Tamaños de fuente aumentados un ~20% para mejor legibilidad en móviles */
+    h1 { color: #2c3e50; font-size: 29px; margin-bottom: 10px; }
+    p { font-size: 19px; color: #555; line-height: 1.5; }
+    
+    .form-group {
+      margin: 25px 0;
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 19px;
+      font-weight: 500;
+    }
+    /* Estilos del campo de texto requerido */
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 19px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box; /* Previene que el padding desborde el ancho en móviles */
+    }
     button {
       background-color: #27ae60;
       color: white;
       border: none;
-      padding: 12px 20px;
+      padding: 15px 20px;
       border-radius: 6px;
-      font-size: 16px;
+      font-size: 19px;
       cursor: pointer;
       width: 100%;
       transition: background 0.3s;
+      font-weight: bold;
     }
     button:hover { background-color: #219150; }
-    #mensaje-respuesta { margin-top: 15px; font-weight: bold; color: #27ae60; }
+    button:disabled { background-color: #95a5a6; cursor: not-allowed; }
+    #mensaje-respuesta { margin-top: 20px; font-size: 19px; font-weight: bold; color: #27ae60; }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <h1 id="saludo">¡Estás Invitado/a!</h1>
-    <p>Nos encantaría contar con tu presencia en nuestro evento especial, este sabado 8 de agosto en Monte Patria.</p>
+    <h1>¡Estás Invitado/a!</h1>
+    <p>Nos encantaría contar con tu presencia en nuestro evento especial, este sábado 8 de agosto en Monte Patria.</p>
     
-    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+    <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
 
     <form id="rsvp-form">
-      <p>¿Nos acompañan, <strong id="nombre-pantalla">Querido/a Invitado/a</strong>?</p>
-      
-      <div class="options">
-        <label>
-          <input type="radio" name="asistencia" value="Confirmado" required> ¡Sí, ahí estaremos! 🎉
-        </label>
-        <label>
-          <input type="radio" name="asistencia" value="No Asiste"> Lamentablemente no podremos ir 😢
-        </label>
+      <div class="form-group">
+        <label for="nombre-invitado">¿Quién confirma su asistencia?</label>
+        <!-- Atributo 'required' para forzar el llenado antes de enviar -->
+        <input type="text" id="nombre-invitado" placeholder="Ingresa tu nombre y apellido" required>
       </div>
 
-      <button type="submit" id="btn-submit">Enviar Confirmación</button>
+      <button type="submit" id="btn-submit">Confirmar Asistencia</button>
     </form>
 
     <div id="mensaje-respuesta"></div>
   </div>
 
   <script>
-    // 1. REEMPLAZA ESTA URL CON TU URL DE GOOGLE APPS SCRIPT DEL PASO 1
+    // URL de Google Apps Script
     const URL_DE_TU_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbzYIzoTr_qark-S_CegwiroLlKqZWRAEhtAVtU4IDnE3rrqdkRoHGQIaNtC9qiFYVWi/exec";
 
-    // 2. Leer la URL para obtener el parámetro "invitado"
-    const urlParams = new URLSearchParams(window.location.search);
-    const invitado = urlParams.get('invitado') || "Invitado/a Especial";
-
-    // Mostrar el nombre capturado en la pantalla
-    document.getElementById('nombre-pantalla').textContent = invitado;
-    document.getElementById('saludo').textContent = `¡Hola, ${invitado}!`;
-
-    // 3. Manejar el envío del formulario
     const form = document.getElementById('rsvp-form');
+    const inputNombre = document.getElementById('nombre-invitado');
     const mensajeRespuesta = document.getElementById('mensaje-respuesta');
     const btnSubmit = document.getElementById('btn-submit');
 
-    form.addEventListener('submit', function(e) {
+    // Desacoplando la lógica de envío mediante Async/Await para un Clean Code
+    form.addEventListener('submit', async function(e) {
       e.preventDefault();
       
+      const nombre = inputNombre.value.trim();
+      
+      // Control de estado de la interfaz
       btnSubmit.disabled = true;
-      btnSubmit.textContent = "Guardando...";
+      btnSubmit.textContent = "Confirmando...";
 
-      const respuestaAsistencia = document.querySelector('input[name="asistencia"]:checked').value;
-
+      // Payload simplificado: al presionar el botón se asume directamente la asistencia
       const datos = {
-        nombre: invitado,
-        asistencia: respuestaAsistencia
+        nombre: nombre,
+        asistencia: "Confirmado"
       };
 
-      // Enviar datos a Google Sheets
-      fetch(URL_DE_TU_APPS_SCRIPT, {
-        method: 'POST',
-        mode: 'no-cors', // Evita bloqueos de CORS
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datos)
-      })
-      .then(() => {
+      try {
+        await fetch(URL_DE_TU_APPS_SCRIPT, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos)
+        });
+
+        // Respuesta exitosa (Renderización)
         form.style.display = 'none';
-        mensajeRespuesta.textContent = "¡Muchas gracias! Tu respuesta ha sido registrada.";
-      })
-      .catch(error => {
-        console.error('Error:', error);
+        mensajeRespuesta.textContent = "¡Muchas gracias! Tu asistencia ha sido confirmada.";
+      } catch (error) {
+        // Manejo de errores
+        console.error('Error en la petición fetch:', error);
         btnSubmit.disabled = false;
-        btnSubmit.textContent = "Enviar Confirmación";
-        alert("Hubo un error al enviar tu respuesta. Por favor intenta de nuevo.");
-      });
+        btnSubmit.textContent = "Confirmar Asistencia";
+        alert("Hubo un error de conexión al enviar tu respuesta. Por favor intenta de nuevo.");
+      }
     });
   </script>
 </body>
